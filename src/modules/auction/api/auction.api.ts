@@ -17,7 +17,7 @@ export async function getAuctionById(id: string): Promise<Auction> {
 }
 
 export async function createAuction(payload: CreateAuctionPayload): Promise<Auction> {
-  const response = await api.post<Auction>(`/auctions/${payload.id}/create/`, payload);
+  const response = await api.post<Auction>('/auctions', payload);
   return response.data;
 }
 

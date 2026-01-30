@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import auctionRoutes from '../modules/auction/router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // As rotas dos módulos serão adicionadas aqui
+    ...auctionRoutes,
+    // As rotas dos outros módulos serão adicionadas aqui
   ]
 })
 
