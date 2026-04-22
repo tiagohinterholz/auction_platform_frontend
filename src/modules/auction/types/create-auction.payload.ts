@@ -3,4 +3,5 @@ export interface CreateAuctionPayload {
   title: string;
   startingPrice: number;
   minimumIncrement: number;
+  images: string[];
 }

@@ -23,6 +23,11 @@
         <input type="number" id="minimumIncrement" v-model.number="minimumIncrement" required min="1" />
       </div>
 
+      <div class="form-group">
+        <label for="images">URL da Imagem (Opcional):</label>
+        <input type="text" id="images" v-model="imageUrl" placeholder="http://exemplo.com/imagem.png" />
+      </div>
+
       <button type="submit" :disabled="isLoading">
         {{ isLoading ? 'Criando...' : 'Criar Leilão' }}
       </button>
@@ -45,6 +50,7 @@ const auctionId = ref('');
 const title = ref('');
 const startingPrice = ref(0);
 const minimumIncrement = ref(1);
+const imageUrl = ref('');
 
 const isLoading = ref(false);
 const error = ref<string | null>(null);
@@ -58,6 +64,7 @@ async function handleSubmit() {
     title: title.value,
     startingPrice: startingPrice.value,
     minimumIncrement: minimumIncrement.value,
+    images: imageUrl.value ? [imageUrl.value] : [],
   };
 
   try {
