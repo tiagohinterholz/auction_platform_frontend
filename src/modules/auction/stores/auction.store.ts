@@ -9,6 +9,7 @@ import {
 export const useAuctionStore = defineStore("auctions", {
   state: () => ({
     auctions: [] as Auction[],
+    currentAuction: null as Auction | null,
     isLoading: false,
     error: null as string | null,
   }),
@@ -53,6 +54,19 @@ export const useAuctionStore = defineStore("auctions", {
       } catch (err: any) {
         this.error = err.response?.data?.message || "Falha ao criar leilão.";
         return null;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
+    async fetchAuctionById(id: string) {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const data = await AuctionAPI.getById(id);
+        this.currentAuction = data;
+      } catch (err) {
+        this.error = "Falha ao buscar detalhes do leilão.";
       } finally {
         this.isLoading = false;
       }

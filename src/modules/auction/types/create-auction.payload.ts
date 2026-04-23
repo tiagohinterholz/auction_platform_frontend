@@ -1,7 +1,9 @@
 export interface CreateAuctionPayload {
-  id: string;
   title: string;
+  description: string;
   startingPrice: number;
   minimumIncrement: number;
+  startTime: string;
+  endTime: string;
   images: string[];
 }

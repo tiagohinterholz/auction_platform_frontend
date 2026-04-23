@@ -9,4 +9,5 @@ export interface Auction {
   startTime?: string;
   endTime?: string;
   reason?: string;
+  images: string[];
 }
