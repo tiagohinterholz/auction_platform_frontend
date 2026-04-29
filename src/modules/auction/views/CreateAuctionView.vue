@@ -1,97 +1,62 @@
 <template>
-  <div class="create-auction-container">
-    <div class="glass-card">
-      <h1>Criar Novo Leilão</h1>
-      <p class="subtitle">Preencha os detalhes para iniciar um novo leilão na plataforma.</p>
-
-      <form @submit.prevent="handleSubmit" class="auction-form">
-        <div class="form-grid">
-          <div class="form-group full-width">
-            <label for="title">Título do Leilão</label>
-            <input 
-              type="text" 
-              id="title" 
-              v-model="title" 
-              placeholder="Ex: iPhone 15 Pro Max - Lote 01"
-              required 
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="startingPrice">Preço Inicial (R$)</label>
-            <div class="input-with-icon">
-              <span class="currency-prefix">R$</span>
+  <!-- Background com gradiente radial via Tailwind -->
+  <div class="min-h-screen py-12 px-4 bg-[radial-gradient(circle_at_top_right,_#1e293b_0%,_#0f172a_100%)] flex justify-center items-start">
+    <div class="w-full max-w-2xl">
+      <AppCard>
+        <h1 class="text-white text-4xl font-bold mb-2 tracking-tight">Criar Novo Leilão</h1>
+        <p class="text-slate-400 text-lg mb-10">Preencha os detalhes para iniciar um novo leilão na plataforma.</p>
+        <form @submit.prevent="handleSubmit" class="space-y-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <AppFormField label="Título do Leilão" htmlFor="title" fullWidth>
               <input 
-                type="number" 
-                id="startingPrice" 
-                v-model.number="startingPrice" 
-                required 
-                min="0" 
+                id="title" v-model="title" type="text" required
+                placeholder="Ex: iPhone 15 Pro Max - Lote 01"
+                class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 focus:bg-white/[0.07] transition-all"
               />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="minimumIncrement">Incremento Mínimo (R$)</label>
-            <div class="input-with-icon">
-              <span class="currency-prefix">R$</span>
+            </AppFormField>
+            <AppFormField label="Preço Inicial (R$)" htmlFor="startingPrice">
+              <AppCurrencyInput id="startingPrice" v-model="startingPrice" :min="0" required />
+            </AppFormField>
+            <AppFormField label="Incremento Mínimo (R$)" htmlFor="minimumIncrement">
+              <AppCurrencyInput id="minimumIncrement" v-model="minimumIncrement" :min="1" required />
+            </AppFormField>
+            <AppFormField 
+              label="URL da Imagem do Produto" 
+              htmlFor="images" 
+              fullWidth 
+              helpText="Insira um link direto para a imagem principal do lote."
+            >
               <input 
-                type="number" 
-                id="minimumIncrement" 
-                v-model.number="minimumIncrement" 
-                required 
-                min="1" 
+                id="images" v-model="imageUrl" type="text"
+                placeholder="https://sua-imagem.com/produto.png"
+                class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 focus:bg-white/[0.07] transition-all"
               />
-            </div>
+            </AppFormField>
+            <AppFormField label="Data de Início" htmlFor="startTime">
+              <input 
+                id="startTime" v-model="startTime" type="datetime-local" required
+                class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 transition-all [color-scheme:dark]"
+              />
+            </AppFormField>
+            <AppFormField label="Data de Término" htmlFor="endTime">
+              <input 
+                id="endTime" v-model="endTime" type="datetime-local" required
+                class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 transition-all [color-scheme:dark]"
+              />
+            </AppFormField>
           </div>
-
-          <div class="form-group full-width">
-            <label for="images">URL da Imagem do Produto</label>
-            <input 
-              type="text" 
-              id="images" 
-              v-model="imageUrl" 
-              placeholder="https://sua-imagem.com/produto.png" 
-            />
-            <small class="help-text">Insira um link direto para a imagem principal do lote.</small>
+          <div class="flex flex-col-reverse md:flex-row gap-4 justify-end">
+            <AppButton variant="secondary" @click="router.back()">
+              Cancelar
+            </AppButton>
+            <AppButton type="submit" :loading="isLoading">
+              Publicar Leilão
+            </AppButton>
           </div>
-
-          <div class="form-group">
-            <label for="startTime">Data de Início</label>
-            <input 
-              type="datetime-local" 
-              id="startTime" 
-              v-model="startTime" 
-              required 
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="endTime">Data de Término</label>
-            <input 
-              type="datetime-local" 
-              id="endTime" 
-              v-model="endTime" 
-              required 
-            />
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn-secondary" @click="router.back()">Cancelar</button>
-          <button type="submit" class="btn-primary" :disabled="isLoading">
-            <span v-if="isLoading" class="loader"></span>
-            {{ isLoading ? 'Processando...' : 'Publicar Leilão' }}
-          </button>
-        </div>
-
-        <Transition name="fade">
-          <div v-if="error" class="error-alert">
-            <i class="icon-error">!</i>
-            <span>{{ error }}</span>
-          </div>
-        </Transition>
-      </form>
+          <AppAlert :message="error || ''" type="error" />
+        </form>
+      </AppCard>
     </div>
   </div>
 </template>
@@ -101,6 +66,11 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
 import type { CreateAuctionPayload } from '../types';
+import AppButton from '@/components/AppButton.vue';
+import AppCard from '@/components/AppCard.vue';
+import AppFormField from '@/components/AppFormField.vue';
+import AppAlert from '@/components/AppAlert.vue';
+import AppCurrencyInput from '@/components/AppCurrencyInput.vue';
 
 const router = useRouter();
 const auctionStore = useAuctionStore();
@@ -110,7 +80,6 @@ const startingPrice = ref(0);
 const minimumIncrement = ref(1);
 const imageUrl = ref('');
 
-// Helper to get ISO date for datetime-local input
 const getFutureDate = (hours: number) => {
   const d = new Date();
   d.setHours(d.getHours() + hours);
@@ -152,213 +121,3 @@ async function handleSubmit() {
   }
 }
 </script>
-
-<style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-
-.create-auction-container {
-  min-height: 100vh;
-  padding: 3rem 1rem;
-  background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  font-family: 'Outfit', sans-serif;
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 3rem;
-  border-radius: 24px;
-  width: 100%;
-  max-width: 680px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-h1 {
-  color: #fff;
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
-}
-
-.subtitle {
-  color: #94a3b8;
-  font-size: 1.1rem;
-  margin-bottom: 2.5rem;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.full-width {
-  grid-column: span 2;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-label {
-  color: #e2e8f0;
-  font-weight: 600;
-  font-size: 0.95rem;
-  margin-left: 0.2rem;
-}
-
-input {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 0.9rem 1.2rem;
-  color: #fff;
-  font-size: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-input:focus {
-  outline: none;
-  border-color: #38bdf8;
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
-}
-
-.input-with-icon {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.currency-prefix {
-  position: absolute;
-  left: 1.2rem;
-  color: #64748b;
-  font-weight: 600;
-  pointer-events: none;
-}
-
-.input-with-icon input {
-  padding-left: 3.2rem;
-  width: 100%;
-}
-
-.help-text {
-  color: #64748b;
-  font-size: 0.8rem;
-  margin-top: 0.2rem;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-  color: white;
-  border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 15px -3px rgba(2, 132, 199, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(2, 132, 199, 0.4);
-  filter: brightness(1.1);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: #94a3b8;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-}
-
-.error-alert {
-  margin-top: 2rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #fca5a5;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-@keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
-}
-
-.loader {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-
-@media (max-width: 640px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  .full-width {
-    grid-column: span 1;
-  }
-  .glass-card {
-    padding: 2rem 1.5rem;
-  }
-  .form-actions {
-    flex-direction: column-reverse;
-  }
-}
-</style>

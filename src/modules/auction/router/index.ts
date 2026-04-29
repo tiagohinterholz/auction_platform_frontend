@@ -1,29 +1,29 @@
-import type { RouteRecordRaw } from 'vue-router';
+import type { RouteRecordRaw } from "vue-router";
 
 const auctionRoutes: RouteRecordRaw[] = [
   {
-    path: '/auctions',
-    name: 'AuctionList',
-    component: () => import('../views/AuctionListView.vue'),
+    path: "/auctions",
+    name: "AuctionList",
+    component: () => import("../views/AuctionListView.vue"),
     meta: {
-      title: 'List of Auctions',
+      title: "List of Auctions",
     },
   },
   {
-    path: '/auctions/create',
-    name: 'CreateAuction',
-    component: () => import('../views/CreateAuctionView.vue'),
+    path: "/auctions/create",
+    name: "CreateAuction",
+    component: () => import("../views/CreateAuctionView.vue"),
     meta: {
-      title: 'Criar Novo Leilão',
+      title: "Criar Novo Leilão",
     },
   },
   {
-    path: '/auctions/:id',
-    name: 'AuctionDetail',
-    component: () => import('../views/AuctionDetailView.vue'),
+    path: "/auctions/:id",
+    name: "AuctionDetail",
+    component: () => import("../views/AuctionDetailView.vue"),
     props: true,
     meta: {
-      title: 'Detalhes do Leilão',
+      title: "Detalhes do Leilão",
     },
   },
 ];
