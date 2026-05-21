@@ -28,17 +28,12 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = true;
       this.error = null;
       try {
-        console.log("Before API call");
         const data = await AuctionAPI.getAuctions();
-        console.log("API response:", data);
         this.auctions = data;
-        console.log("Auctions state updated:", this.auctions);
       } catch (err) {
-        console.error("Error fetching auctions:", err);
         this.error = "Falha ao buscar leilões.";
       } finally {
         this.isLoading = false;
-        console.log("fetchAuctions finished");
       }
     },
 
@@ -49,7 +44,6 @@ export const useAuctionStore = defineStore("auctions", {
       this.error = null;
       try {
         const newAuction = await AuctionAPI.create(payload);
-        // this.auctions.push(newAuction); // No longer needed
         return newAuction;
       } catch (err: any) {
         this.error = err.response?.data?.message || "Falha ao criar leilão.";

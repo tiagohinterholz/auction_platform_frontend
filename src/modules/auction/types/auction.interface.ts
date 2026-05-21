@@ -3,6 +3,7 @@ import type { AuctionStatus } from './auction-status.enum';
 export interface Auction {
   auctionId: string;
   title: string;
+  description: string;
   status: AuctionStatus;
   startingPrice: number;
   minimumIncrement: number;

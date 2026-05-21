@@ -15,6 +15,7 @@ const auctionRoutes: RouteRecordRaw[] = [
     component: () => import("../views/CreateAuctionView.vue"),
     meta: {
       title: "Criar Novo Leilão",
+      requiresAuth: true,
     },
   },
   {
@@ -23,7 +24,7 @@ const auctionRoutes: RouteRecordRaw[] = [
     component: () => import("../views/AuctionDetailView.vue"),
     props: true,
     meta: {
-      title: "Detalhes do Leilão",
+      title: "Auction Details",
     },
   },
 ];

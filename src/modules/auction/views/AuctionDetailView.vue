@@ -1,8 +1,5 @@
 <template>
-  <!-- Container principal com o gradiente que estava no CSS -->
   <div class="min-h-screen py-12 px-4 md:px-8 bg-[radial-gradient(circle_at_top_right,_#1e293b_0%,_#0f172a_100%)] text-white">
-    
-    <!-- Estados de Loading e Erro usando AppAlert -->
     <div v-if="isLoading" class="max-w-7xl mx-auto flex flex-col items-center justify-center py-20">
       <div class="w-12 h-12 border-4 border-sky-400/30 border-t-sky-400 rounded-full animate-spin mb-4"></div>
       <p class="text-slate-400">Buscando detalhes do lote...</p>
@@ -17,23 +14,20 @@
       </AppCard>
     </div>
 
-    <!-- Conteúdo Principal -->
-    <div v-else-if="auction" class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
-      
-      <!-- Coluna Esquerda: Imagem e Descrição -->
+    <div v-else-if="currentAuction" class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
       <div class="space-y-8">
         <div class="relative group">
           <AppCard class="p-2 overflow-hidden aspect-video">
             <img 
-              :src="auction.images?.[0] || 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800'" 
-              :alt="auction.title" 
+              :src="currentAuction.images?.[0] || 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800'" 
+              :alt="currentAuction.title" 
               class="w-full h-full object-cover rounded-2xl transition-transform duration-700 group-hover:scale-105"
             />
             <div 
               class="absolute top-6 right-6 px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs shadow-2xl"
-              :class="auction.status === 'ACTIVE' ? 'bg-emerald-500 text-white' : 'bg-sky-500 text-white'"
+              :class="currentAuction.status === 'ACTIVE' ? 'bg-emerald-500 text-white' : 'bg-sky-500 text-white'"
             >
-              {{ auction.status }}
+              {{ currentAuction.status }}
             </div>
           </AppCard>
         </div>
@@ -48,31 +42,28 @@
           <div class="flex flex-wrap gap-12 pt-8 border-t border-white/10">
             <div>
               <span class="block text-slate-500 text-[10px] uppercase font-black mb-1">ID do Leilão</span>
-              <span class="text-lg font-bold text-slate-200">#{{ auction.auctionId.slice(0, 8) }}</span>
+              <span class="text-lg font-bold text-slate-200">#{{ currentAuction.auctionId.slice(0, 8) }}</span>
             </div>
             <div>
               <span class="block text-slate-500 text-[10px] uppercase font-black mb-1">Incremento Mín.</span>
-              <span class="text-lg font-bold text-sky-400">R$ {{ auction.minimumIncrement.toLocaleString('pt-BR') }}</span>
+              <span class="text-lg font-bold text-sky-400">R$ {{ currentAuction.minimumIncrement.toLocaleString('pt-BR') }}</span>
             </div>
           </div>
         </AppCard>
       </div>
 
-      <!-- Coluna Direita: Bidding & Stats -->
       <div class="space-y-8">
-        <!-- Componente do Timer que extraímos -->
         <AuctionTimer 
-          :endTime="auction.endTime" 
+          :endTime="currentAuction.endTime" 
           @end="handleTimerEnd" 
         />
 
-        <!-- Card de Lances -->
         <AppCard>
           <div class="mb-8">
             <span class="text-slate-500 text-[10px] uppercase font-black">Lance Atual</span>
             <div class="flex items-baseline gap-2 mt-1">
               <span class="text-2xl font-bold text-sky-400 italic">R$</span>
-              <span class="text-6xl font-black">{{ auction.startingPrice.toLocaleString('pt-BR') }}</span>
+              <span class="text-6xl font-black">{{ currentAuction.startingPrice.toLocaleString('pt-BR') }}</span>
             </div>
             <span class="text-slate-500 text-sm italic">12 lances registrados</span>
           </div>
@@ -98,7 +89,6 @@
           </form>
         </AppCard>
 
-        <!-- Histórico (Pode ser um componente futuro) -->
         <AppCard class="!p-8">
           <h3 class="text-lg font-bold mb-6">Últimos Lances</h3>
           <div class="space-y-4">
@@ -107,7 +97,7 @@
                 <span class="block text-sm font-bold text-slate-200">Usuário #{{ 1234 + i }}</span>
                 <span class="text-[10px] text-slate-500 uppercase">há {{ i * 2 }} minutos</span>
               </div>
-              <span class="text-sky-400 font-black">R$ {{ (auction.startingPrice - (i * 500)).toLocaleString('pt-BR') }}</span>
+              <span class="text-sky-400 font-black">R$ {{ (currentAuction.startingPrice - (i * 500)).toLocaleString('pt-BR') }}</span>
             </div>
           </div>
           <button class="w-full mt-6 text-slate-500 hover:text-white text-sm font-bold transition-colors uppercase tracking-widest text-[10px]">
@@ -115,7 +105,6 @@
           </button>
         </AppCard>
       </div>
-
     </div>
   </div>
 </template>
@@ -126,36 +115,33 @@ import { useRoute } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
 import { storeToRefs } from 'pinia';
 import { AuctionStatus } from '../types';
-
-// Componentes Base e Específicos
 import AuctionTimer from '@/modules/auction/components/AuctionTimer.vue';
 import AppCard from '@/components/AppCard.vue';
 import AppButton from '@/components/AppButton.vue';
 
 const route = useRoute();
 const auctionStore = useAuctionStore();
-const { currentAuction: auction, isLoading, error } = storeToRefs(auctionStore);
+const { currentAuction, isLoading, error } = storeToRefs(auctionStore);
 
 const bidAmount = ref(0);
 
 const fetchData = async () => {
   await auctionStore.fetchAuctionById(route.params.id as string);
-  if (auction.value) {
-    bidAmount.value = auction.value.startingPrice + auction.value.minimumIncrement;
+  if (currentAuction.value) {
+    bidAmount.value = currentAuction.value.startingPrice + currentAuction.value.minimumIncrement;
   }
 };
 
 const minNextBid = computed(() => {
-  if (!auction.value) return 0;
-  return auction.value.startingPrice + auction.value.minimumIncrement;
+  if (!currentAuction.value) return 0;
+  return currentAuction.value.startingPrice + currentAuction.value.minimumIncrement;
 });
 
 const isAuctionActive = computed(() => {
-  return auction.value?.status === AuctionStatus.ACTIVE;
+  return currentAuction.value?.status === AuctionStatus.ACTIVE;
 });
 
 function handleTimerEnd() {
-  console.log("Leilão encerrado!");
   fetchData(); 
 }
 

@@ -1,5 +1,4 @@
 <template>
-  <!-- Background com gradiente radial via Tailwind -->
   <div class="min-h-screen py-12 px-4 bg-[radial-gradient(circle_at_top_right,_#1e293b_0%,_#0f172a_100%)] flex justify-center items-start">
     <div class="w-full max-w-2xl">
       <AppCard>
@@ -21,28 +20,23 @@
             <AppFormField label="Incremento Mínimo (R$)" htmlFor="minimumIncrement">
               <AppCurrencyInput id="minimumIncrement" v-model="minimumIncrement" :min="1" required />
             </AppFormField>
-            <AppFormField 
-              label="URL da Imagem do Produto" 
-              htmlFor="images" 
-              fullWidth 
+            <AppFormField label="Descrição" htmlFor="description" fullWidth>
+              <textarea
+                id="description" v-model="description" rows="3" required
+                placeholder="Descreva o item que está sendo leiloado..."
+                class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 focus:bg-white/[0.07] transition-all resize-none"
+              />
+            </AppFormField>
+            <AppFormField
+              label="URL da Imagem do Produto"
+              htmlFor="images"
+              fullWidth
               helpText="Insira um link direto para a imagem principal do lote."
             >
               <input 
                 id="images" v-model="imageUrl" type="text"
                 placeholder="https://sua-imagem.com/produto.png"
                 class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 focus:bg-white/[0.07] transition-all"
-              />
-            </AppFormField>
-            <AppFormField label="Data de Início" htmlFor="startTime">
-              <input 
-                id="startTime" v-model="startTime" type="datetime-local" required
-                class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 transition-all [color-scheme:dark]"
-              />
-            </AppFormField>
-            <AppFormField label="Data de Término" htmlFor="endTime">
-              <input 
-                id="endTime" v-model="endTime" type="datetime-local" required
-                class="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-sky-400 transition-all [color-scheme:dark]"
               />
             </AppFormField>
           </div>
@@ -76,19 +70,10 @@ const router = useRouter();
 const auctionStore = useAuctionStore();
 
 const title = ref('');
+const description = ref('');
 const startingPrice = ref(0);
 const minimumIncrement = ref(1);
 const imageUrl = ref('');
-
-const getFutureDate = (hours: number) => {
-  const d = new Date();
-  d.setHours(d.getHours() + hours);
-  d.setMinutes(0);
-  return d.toISOString().slice(0, 16);
-};
-
-const startTime = ref(getFutureDate(1));
-const endTime = ref(getFutureDate(25));
 
 const isLoading = ref(false);
 const error = ref<string | null>(null);
@@ -99,13 +84,15 @@ async function handleSubmit() {
 
   const payload: CreateAuctionPayload = {
     title: title.value,
-    description: 'Leilão criado via plataforma premium.', // Placeholder for now
+    description: description.value,
     startingPrice: startingPrice.value,
     minimumIncrement: minimumIncrement.value,
     images: imageUrl.value ? [imageUrl.value] : [],
-    startTime: new Date(startTime.value).toISOString(),
-    endTime: new Date(endTime.value).toISOString(),
+    // startTime: new Date(startTime.value).toISOString(),
+    // endTime: new Date(endTime.value).toISOString(),
   };
+  isLoading.value = true;
+  error.value = null;
 
   try {
     const newAuction = await auctionStore.createAuction(payload);
