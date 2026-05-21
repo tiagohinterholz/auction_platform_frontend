@@ -10,7 +10,7 @@ import TheFooter from './components/TheFooter.vue';
     <main class="flex-grow">
       <RouterView v-slot="{ Component }">
         <transition name="page-fade" mode="out-in">
-          <component :is="Component" />
+          <component :is="Component" :key="$route.fullPath" />
         </transition>
       </RouterView>
     </main>
