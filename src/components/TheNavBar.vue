@@ -29,6 +29,9 @@ async function handleLogout() {
         <RouterLink to="/auctions/create" class="nav-link px-4 py-2 rounded-xl bg-sky-400/10 text-sky-400 border border-sky-400/20 hover:bg-sky-400 hover:text-slate-900 transition-all duration-200 hover:-translate-y-px">
           Criar Leilão
         </RouterLink>
+        <RouterLink v-if="authStore.isAuthenticated" to="/my-auctions" class="nav-link px-4 py-2 rounded-xl bg-sky-400/10 text-sky-400 border border-sky-400/20 hover:bg-sky-400 hover:text-slate-900 transition-all duration-200 hover:-translate-y-px">
+          Meus Leilões
+        </RouterLink>
       </nav>
 
       <div class="flex items-center gap-3">

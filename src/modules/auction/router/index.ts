@@ -27,6 +27,15 @@ const auctionRoutes: RouteRecordRaw[] = [
       title: "Auction Details",
     },
   },
+  {
+    path: "/my-auctions",
+    name: "MyAuctions",
+    component: () => import("../views/MyAuctionsView.vue"),
+    meta: {
+      title: "My Auctions",
+      requiresAuth: true,
+    },
+  }
 ];
 
 export default auctionRoutes;

@@ -50,7 +50,7 @@
             </div>
             <!-- Timer Pequeno sobre a imagem -->
             <div class="absolute bottom-4 right-4">
-              <AuctionTimer :endTime="auction.endTime" size="sm" />
+              <AuctionTimer v-if="auction.endTime" :endTime="auction.endTime" size="sm" />
             </div>
           </div>
 

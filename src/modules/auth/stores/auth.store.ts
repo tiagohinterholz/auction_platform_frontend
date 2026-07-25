@@ -9,6 +9,7 @@ interface AuthState {
   name?: string | null;
   email?: string | null;
   role?: string | null;
+  userId?: string | null;
 }
 
 export const useAuthStore = defineStore("auth", {
@@ -21,6 +22,7 @@ export const useAuthStore = defineStore("auth", {
       name: payload?.name,
       email: payload?.email,
       role: payload?.role,  
+      userId: payload?.subject || null,
     };
   },
 
@@ -38,6 +40,7 @@ export const useAuthStore = defineStore("auth", {
       this.name = payload.name || null;
       this.email = payload.email || null;
       this.role = payload.role || null;
+      this.userId = payload.subject || null;
     },
 
     async login(payload: LoginDto) {
@@ -62,6 +65,7 @@ export const useAuthStore = defineStore("auth", {
         this.name = null;
         this.email = null;
         this.role = null;
+        this.userId = null;
         localStorage.removeItem("access_token");
       }
     },
