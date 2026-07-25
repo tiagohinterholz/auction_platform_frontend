@@ -8,15 +8,17 @@ import type {
 
 function mapAuction(raw: any): Auction {
   return {
-    auctionId: raw.id,
+    auctionId: raw.auctionId,
     title: raw.title,
     description: raw.description,
     status: raw.status,
-    startingPrice: raw.start_price,
-    minimumIncrement: raw.minimum_increment,
-    startTime: raw.start_time ?? undefined,
-    endTime: raw.end_time ?? undefined,
+    startingPrice: raw.startingPrice,
+    highestBid: raw.highestBid ?? raw.startingPrice,
+    minimumIncrement: raw.minimumIncrement,
+    startTime: raw.startTime ?? undefined,
+    endTime: raw.endTime ?? undefined,
     images: raw.images ?? [],
+    userId: raw.userId,
   };
 }
 
@@ -31,15 +33,19 @@ export class AuctionAPI {
     return mapAuction(response.data);
   }
 
+  static async getMyAuctions(): Promise<Auction[]> {
+    const response = await api.get<any[]>("/auctions/me");
+    return response.data.map(mapAuction);
+  }
+
   static async create(payload: CreateAuctionPayload): Promise<Auction> {
-    const body = {
+    const response = await api.post<any>("/auctions", {
       title: payload.title,
       description: payload.description,
-      start_price: payload.startingPrice,
-      minimum_increment: payload.minimumIncrement,
+      startingPrice: payload.startingPrice,
+      minimumIncrement: payload.minimumIncrement,
       images: payload.images,
-    };
-    const response = await api.post<any>("/auctions", body);
+    });
     return mapAuction(response.data);
   }
 
@@ -47,30 +53,25 @@ export class AuctionAPI {
     id: string,
     payload: ScheduleAuctionPayload,
   ): Promise<Auction> {
-    const body = {
-      start_time: payload.startTime,
-      end_time: payload.endTime,
-    };
-    const response = await api.patch<Auction>(
-      `/auctions/${id}/schedule`,
-      body,
-    );
-    return response.data;
+    const response = await api.patch<any>(`/auctions/${id}/schedule`, {
+      startTime: payload.startTime,
+      endTime: payload.endTime,
+    });
+    return mapAuction(response.data);
   }
 
   static async finish(id: string): Promise<Auction> {
-    const response = await api.patch<Auction>(`/auctions/${id}/finish`);
-    return response.data;
+    const response = await api.patch<any>(`/auctions/${id}/finish`);
+    return mapAuction(response.data);
   }
 
   static async cancel(
     id: string,
     payload: CancelAuctionPayload,
   ): Promise<Auction> {
-    const response = await api.patch<Auction>(
-      `/auctions/${id}/cancel`,
-      payload.reason,
-    );
-    return response.data;
+    const response = await api.patch<any>(`/auctions/${id}/cancel`, {
+      reason: payload.reason,
+    });
+    return mapAuction(response.data);
   }
 }
