@@ -2,6 +2,7 @@
 defineProps<{
   variant?: 'primary' | 'secondary'
   loading?: boolean
+  disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
 }>()
 </script>
@@ -9,7 +10,7 @@ defineProps<{
 <template>
   <button
     :type="type ?? 'button'"
-    :disabled="loading"
+    :disabled="loading || disabled"
     :class="[
       'inline-flex items-center gap-3 px-10 py-4 rounded-xl text-lg font-bold cursor-pointer transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed',
       variant === 'secondary'

@@ -88,16 +88,12 @@ async function handleSubmit() {
     startingPrice: startingPrice.value,
     minimumIncrement: minimumIncrement.value,
     images: imageUrl.value ? [imageUrl.value] : [],
-    // startTime: new Date(startTime.value).toISOString(),
-    // endTime: new Date(endTime.value).toISOString(),
   };
-  isLoading.value = true;
-  error.value = null;
 
   try {
-    const newAuction = await auctionStore.createAuction(payload);
-    if (newAuction) {
-      router.push(`/auctions/`);
+    await auctionStore.createAuction(payload);
+    if (!auctionStore.error) {
+      router.push('/auctions/');
     } else {
       error.value = auctionStore.error;
     }

@@ -66,7 +66,7 @@
                 <div class="flex items-baseline gap-1">
                   <span class="text-sky-400 font-bold text-sm">R$</span>
                   <span class="text-2xl font-black text-slate-100">
-                    {{ auction.startingPrice.toLocaleString('pt-BR') }}
+                    {{ auction.highestBid.toLocaleString('pt-BR') }}
                   </span>
                 </div>
               </div>

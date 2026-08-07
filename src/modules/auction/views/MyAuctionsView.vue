@@ -44,9 +44,9 @@ function openCancelModal(auction: Auction) {
 }
 
 async function confirmCancel() {
-  if (!selectedAuction.value) return;
+  if (!selectedAuction.value || !cancelReason.value.trim()) return;
   await auctionStore.cancelAuction(selectedAuction.value.auctionId, {
-    reason: cancelReason.value || undefined,
+    reason: cancelReason.value,
   });
   showCancelModal.value = false;
 }
@@ -171,10 +171,11 @@ onMounted(() => {
     <div v-if="showCancelModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
       <AppCard class="w-full max-w-md">
         <h2 class="text-xl font-bold mb-2">Cancelar Leilão</h2>
-        <p class="text-slate-400 text-sm mb-6">Informe o motivo do cancelamento (opcional).</p>
+        <p class="text-slate-400 text-sm mb-6">Informe o motivo do cancelamento.</p>
         <textarea
           v-model="cancelReason"
           rows="3"
+          required
           placeholder="Motivo do cancelamento..."
           class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all resize-none"
         />
@@ -184,6 +185,7 @@ onMounted(() => {
             class="!border-red-500/30 !text-red-400 hover:!bg-red-500/10"
             variant="secondary"
             :loading="isLoading"
+            :disabled="!cancelReason.trim()"
             @click="confirmCancel"
           >
             Confirmar Cancelamento

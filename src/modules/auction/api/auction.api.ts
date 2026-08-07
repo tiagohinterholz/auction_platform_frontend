@@ -6,19 +6,25 @@ import type {
   ScheduleAuctionPayload,
 } from "../types";
 
-function mapAuction(raw: any): Auction {
+/**
+ * Backend contract is snake_case, money fields are Decimal serialized as
+ * string (see auction_platform_fast_api's AuctionSchema / .bugs.md #1).
+ * This is the only place that should know that shape — everything past
+ * `mapAuction` deals with the camelCase, numeric `Auction` type.
+ */
+export function mapAuction(raw: any): Auction {
   return {
-    auctionId: raw.auctionId,
+    auctionId: raw.id,
+    userId: raw.user_id,
     title: raw.title,
     description: raw.description,
     status: raw.status,
-    startingPrice: raw.startingPrice,
-    highestBid: raw.highestBid ?? raw.startingPrice,
-    minimumIncrement: raw.minimumIncrement,
-    startTime: raw.startTime ?? undefined,
-    endTime: raw.endTime ?? undefined,
+    startingPrice: Number(raw.start_price),
+    highestBid: Number(raw.highest_bid ?? raw.start_price),
+    minimumIncrement: Number(raw.minimum_increment),
+    startTime: raw.start_time ?? undefined,
+    endTime: raw.end_time ?? undefined,
     images: raw.images ?? [],
-    userId: raw.userId,
   };
 }
 
@@ -42,8 +48,8 @@ export class AuctionAPI {
     const response = await api.post<any>("/auctions", {
       title: payload.title,
       description: payload.description,
-      startingPrice: payload.startingPrice,
-      minimumIncrement: payload.minimumIncrement,
+      start_price: payload.startingPrice,
+      minimum_increment: payload.minimumIncrement,
       images: payload.images,
     });
     return mapAuction(response.data);
@@ -54,14 +60,9 @@ export class AuctionAPI {
     payload: ScheduleAuctionPayload,
   ): Promise<Auction> {
     const response = await api.patch<any>(`/auctions/${id}/schedule`, {
-      startTime: payload.startTime,
-      endTime: payload.endTime,
+      start_date: new Date(payload.startTime).toISOString(),
+      end_date: new Date(payload.endTime).toISOString(),
     });
-    return mapAuction(response.data);
-  }
-
-  static async finish(id: string): Promise<Auction> {
-    const response = await api.patch<any>(`/auctions/${id}/finish`);
     return mapAuction(response.data);
   }
 

@@ -25,7 +25,7 @@
             />
             <div
               class="absolute top-6 right-6 px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs shadow-2xl"
-              :class="currentAuction.status === 'ACTIVE' ? 'bg-emerald-500 text-white' : 'bg-sky-500 text-white'"
+              :class="currentAuction.status === AuctionStatus.ACTIVE ? 'bg-emerald-500 text-white' : 'bg-sky-500 text-white'"
             >
               {{ currentAuction.status }}
             </div>

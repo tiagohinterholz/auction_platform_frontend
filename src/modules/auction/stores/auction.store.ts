@@ -53,9 +53,7 @@ export const useAuctionStore = defineStore("auctions", {
       }
     },
 
-    async createAuction(
-      payload: CreateAuctionPayload,
-    ): Promise<Auction | null> {
+    async createAuction(payload: CreateAuctionPayload): Promise<Auction | null> {
       this.isLoading = true;
       this.error = null;
       try {
