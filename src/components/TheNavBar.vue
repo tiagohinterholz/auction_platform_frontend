@@ -36,10 +36,12 @@ async function handleLogout() {
 
       <div class="flex items-center gap-3">
         <template v-if="authStore.isAuthenticated">
-          <div class="w-10 h-10 rounded-full border-2 border-white/10 overflow-hidden cursor-pointer transition-transform hover:scale-110 hover:border-sky-400">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tiago" alt="User" class="w-full h-full object-cover" />
-          </div>
-          <span>{{ authStore.name }} </span>
+          <RouterLink to="/profile" class="flex items-center gap-3" title="Meu Perfil">
+            <div class="w-10 h-10 rounded-full border-2 border-white/10 overflow-hidden cursor-pointer transition-transform hover:scale-110 hover:border-sky-400">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Tiago" alt="User" class="w-full h-full object-cover" />
+            </div>
+            <span>{{ authStore.name }} </span>
+          </RouterLink>
           <span
             class="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
             :class="authStore.isAdmin 
