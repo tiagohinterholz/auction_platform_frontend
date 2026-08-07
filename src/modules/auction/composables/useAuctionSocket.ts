@@ -1,72 +1,91 @@
 import { ref, onUnmounted } from "vue";
-import { io, type Socket } from "socket.io-client";
 import { useBiddingStore } from "@/modules/bidding/stores/bidding.store";
 import { useAuctionStore } from "@/modules/auction/stores/auction.store";
-import type { Bid } from "@/modules/bidding/types";
+import { AuctionStatus } from "@/modules/auction/types";
 
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace("/api", "") ?? "http://localhost:3000";
+/**
+ * Backend speaks a native WebSocket protocol at /ws/auctions/{auction_id}
+ * (see notification_router.py), not socket.io. Connecting already
+ * subscribes to that auction's room -- no join message needed. Every
+ * broadcast is `{"event": "<name>", "payload": {...snake_case...}}`.
+ */
+export function toWebSocketUrl(auctionId: string): string {
+  const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:8000/api/v1";
+  const wsBase = apiUrl.replace(/^http/, "ws");
+  return `${wsBase}/ws/auctions/${auctionId}`;
+}
+
+interface ServerMessage {
+  event: string;
+  payload: Record<string, any>;
+}
 
 export function useAuctionSocket(auctionId: string) {
-  const socket = ref<Socket | null>(null);
+  const socket = ref<WebSocket | null>(null);
   const isConnected = ref(false);
   const biddingStore = useBiddingStore();
   const auctionStore = useAuctionStore();
 
+  function isCurrentAuction(id: string): boolean {
+    return auctionStore.currentAuction?.auctionId === id;
+  }
+
+  function handleMessage(raw: MessageEvent) {
+    let message: ServerMessage;
+    try {
+      message = JSON.parse(raw.data);
+    } catch {
+      return;
+    }
+
+    const { event, payload } = message;
+
+    switch (event) {
+      case "bidPlaced":
+        if (isCurrentAuction(payload.auction_id) && auctionStore.currentAuction) {
+          auctionStore.currentAuction.highestBid = Number(payload.amount);
+        }
+        biddingStore.fetchBids(auctionId);
+        break;
+
+      case "auctionStarted":
+        if (isCurrentAuction(payload.id) && auctionStore.currentAuction) {
+          auctionStore.currentAuction.status = AuctionStatus.ACTIVE;
+        }
+        break;
+
+      case "auctionExtended":
+        if (isCurrentAuction(payload.id) && auctionStore.currentAuction) {
+          auctionStore.currentAuction.endTime = payload.end_time;
+        }
+        break;
+
+      case "auctionFinished":
+      case "auctionCancelled":
+      case "auctionScheduled":
+        if (isCurrentAuction(payload.id)) {
+          auctionStore.fetchAuctionById(payload.id);
+        }
+        break;
+    }
+  }
+
   function connect() {
-    socket.value = io(SOCKET_URL, { transports: ["websocket"] });
+    socket.value = new WebSocket(toWebSocketUrl(auctionId));
 
-    socket.value.on("connect", () => {
+    socket.value.onopen = () => {
       isConnected.value = true;
-      socket.value!.emit("joinAuction", { auctionId });
-    });
+    };
 
-    socket.value.on("disconnect", () => {
+    socket.value.onclose = () => {
       isConnected.value = false;
-    });
+    };
 
-    socket.value.on("bidPlaced", (payload: Bid) => {
-      biddingStore.addLiveBid(payload);
-      if (auctionStore.currentAuction) {
-        auctionStore.currentAuction.highestBid = payload.amount;
-      }
-    });
-
-    socket.value.on(
-      "auctionExtended",
-      (payload: { auctionId: string; newEndTime: string }) => {
-        if (
-          auctionStore.currentAuction?.auctionId === payload.auctionId
-        ) {
-          auctionStore.currentAuction.endTime = payload.newEndTime;
-        }
-      },
-    );
-
-    socket.value.on(
-      "auctionFinished",
-      (payload: { auctionId: string }) => {
-        if (
-          auctionStore.currentAuction?.auctionId === payload.auctionId
-        ) {
-          auctionStore.fetchAuctionById(payload.auctionId);
-        }
-      },
-    );
-
-    socket.value.on(
-      "auctionCancelled",
-      (payload: { auctionId: string }) => {
-        if (
-          auctionStore.currentAuction?.auctionId === payload.auctionId
-        ) {
-          auctionStore.fetchAuctionById(payload.auctionId);
-        }
-      },
-    );
+    socket.value.onmessage = handleMessage;
   }
 
   function disconnect() {
-    socket.value?.disconnect();
+    socket.value?.close();
     socket.value = null;
     isConnected.value = false;
   }

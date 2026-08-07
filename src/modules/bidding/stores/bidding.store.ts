@@ -42,13 +42,6 @@ export const useBiddingStore = defineStore("bidding", {
       }
     },
 
-    addLiveBid(bid: Bid) {
-      const exists = this.bids.find((b) => b.id === bid.id);
-      if (!exists) {
-        this.bids.unshift(bid);
-      }
-    },
-
     clearBids() {
       this.bids = [];
       this.error = null;
