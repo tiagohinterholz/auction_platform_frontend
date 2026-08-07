@@ -16,11 +16,13 @@ export const authApi = {
     const response = await api.post<AuthResponseDto>("/auth/register", payload);
     return response.data;
   },
-  logout: async (): Promise<void> => {
-    await api.post("/auth/logout");
+  logout: async (refreshToken: string): Promise<void> => {
+    await api.post("/auth/logout", { refresh_token: refreshToken });
   },
-  refresh: async (): Promise<RefreshResponseDto> => {
-    const response = await api.post<RefreshResponseDto>("/auth/refresh");
+  refresh: async (refreshToken: string): Promise<RefreshResponseDto> => {
+    const response = await api.post<RefreshResponseDto>("/auth/refresh", {
+      refresh_token: refreshToken,
+    });
     return response.data;
   },
 };
