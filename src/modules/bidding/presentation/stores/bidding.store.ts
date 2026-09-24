@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { BiddingAPI } from "../api/bidding.api";
-import type { Bid } from "../types";
+import { BiddingAPI } from "../../infrastructure/bidding.api";
+import type { Bid } from "../../domain";
 
 export const useBiddingStore = defineStore("bidding", {
   state: () => ({

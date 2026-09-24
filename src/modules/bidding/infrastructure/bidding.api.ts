@@ -1,5 +1,5 @@
 import { api } from "@/api/http";
-import type { Bid, PlaceBidPayload } from "../types";
+import type { Bid, PlaceBidPayload } from "../domain";
 
 /** Mirrors auction.api.ts's mapAuction: backend is snake_case, amount is a
  * Decimal serialized as string. */

@@ -1,5 +1,5 @@
 import { ref, onUnmounted } from "vue";
-import { useBiddingStore } from "@/modules/bidding/stores/bidding.store";
+import { useBiddingStore } from "@/modules/bidding";
 import { useAuctionStore } from "@/modules/auction/presentation/stores/auction.store";
 import { AuctionStatus } from "@/modules/auction/domain";
 
