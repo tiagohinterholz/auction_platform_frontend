@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { isAuthEndpoint } from "./http";
+import { api, configureHttp, isAuthEndpoint } from "./http";
+import { AxiosHeaders } from "axios";
 
 describe("isAuthEndpoint", () => {
   it("matches /auth/* endpoints, including refresh and logout themselves", () => {
@@ -15,5 +16,38 @@ describe("isAuthEndpoint", () => {
 
   it("does not match undefined", () => {
     expect(isAuthEndpoint(undefined)).toBe(false);
+  });
+  
+});
+
+describe("request interceptor", () => {
+  function makeAuth(token: string | null) {
+    return {
+      getAccessToken: () => token,
+      hasRefreshToken: () => false,
+      refresh: async () => false,
+      onUnauthorized: () => {},
+    };
+  }
+
+  function runRequestInterceptor() {
+    const interceptor = (api.interceptors.request as any).handlers[0].fulfilled;
+    return interceptor({ headers: new AxiosHeaders()})
+  }
+
+  it("adds Authorization header if access token is present", () => {
+    configureHttp(makeAuth("abc123"));
+
+    const config = runRequestInterceptor();
+
+    expect(config.headers.get("Authorization")).toBe("Bearer abc123");
+  });
+
+  it("does not add Authorization header if access token is null", () => {
+    configureHttp(makeAuth(null));
+
+    const config = runRequestInterceptor();
+
+    expect(config.headers.get("Authorization")).toBeUndefined();
   });
 });

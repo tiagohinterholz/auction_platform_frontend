@@ -1,17 +1,22 @@
 import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
-import router from "../router";
-import { useAuthStore } from "@/modules/auth";
+import type { HttpAuth } from "./httpAuth.interface";
+
+
+let auth: HttpAuth | null = null;
+
+export function configureHttp(options: HttpAuth) {
+  auth = options;
+}
 
 export const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
 api.interceptors.request.use((config) => {
-  const authStore = useAuthStore();
 
-  if (authStore.accessToken) {
-    config.headers.Authorization = `Bearer ${authStore.accessToken}`;
+  if (auth?.getAccessToken()) {
+    config.headers.Authorization = `Bearer ${auth?.getAccessToken()}`;
   }
   return config;
 });
@@ -27,18 +32,6 @@ export function isAuthEndpoint(url?: string): boolean {
   return !!url && url.startsWith("/auth/");
 }
 
-function forceLogoutAndRedirect() {
-  const authStore = useAuthStore();
-  authStore.logout();
-
-  if (router.currentRoute.value.path !== "/login") {
-    router.push({
-      path: "/login",
-      query: { redirect: router.currentRoute.value.fullPath },
-    });
-  }
-}
-
 // Concurrent 401s while a refresh is already in flight wait for that single
 // refresh instead of each firing their own POST /auth/refresh.
 let refreshPromise: Promise<boolean> | null = null;
@@ -47,20 +40,19 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config as RetryableConfig | undefined;
-    const authStore = useAuthStore();
 
     const canRetry =
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
       !isAuthEndpoint(originalRequest.url) &&
-      !!authStore.refreshToken;
+      !!auth?.hasRefreshToken();
 
     if (canRetry) {
       originalRequest._retry = true;
 
       if (!refreshPromise) {
-        refreshPromise = authStore.refreshSession().finally(() => {
+        refreshPromise = auth!.refresh().finally(() => {
           refreshPromise = null;
         });
       }
@@ -68,13 +60,13 @@ api.interceptors.response.use(
       const refreshed = await refreshPromise;
 
       if (refreshed) {
-        originalRequest.headers.Authorization = `Bearer ${authStore.accessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${auth?.getAccessToken()}`;
         return api(originalRequest);
       }
     }
 
     if (error.response?.status === 401) {
-      forceLogoutAndRedirect();
+      auth?.onUnauthorized();
     }
 
     return Promise.reject(error);
