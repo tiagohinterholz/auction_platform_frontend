@@ -3,7 +3,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
 import { storeToRefs } from 'pinia';
-import { AuctionStatus, type Auction } from '../types';
+import { AuctionStatus, type Auction } from '@/modules/auction/domain';
 import AppCard from '@/components/AppCard.vue';
 import AppButton from '@/components/AppButton.vue';
 import AppAlert from '@/components/AppAlert.vue';

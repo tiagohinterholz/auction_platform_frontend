@@ -1,7 +1,7 @@
 import { ref, onUnmounted } from "vue";
 import { useBiddingStore } from "@/modules/bidding/stores/bidding.store";
-import { useAuctionStore } from "@/modules/auction/stores/auction.store";
-import { AuctionStatus } from "@/modules/auction/types";
+import { useAuctionStore } from "@/modules/auction/presentation/stores/auction.store";
+import { AuctionStatus } from "@/modules/auction/domain";
 
 /**
  * Backend speaks a native WebSocket protocol at /ws/auctions/{auction_id}

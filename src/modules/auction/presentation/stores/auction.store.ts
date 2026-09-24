@@ -1,12 +1,12 @@
 import { defineStore } from "pinia";
-import { AuctionAPI } from "../api/auction.api";
+import { AuctionAPI } from "../../infrastructure/auction.api";
 import {
   AuctionStatus,
   type Auction,
   type CancelAuctionPayload,
   type CreateAuctionPayload,
   type ScheduleAuctionPayload,
-} from "../types";
+} from "@/modules/auction/domain";
 
 export const useAuctionStore = defineStore("auctions", {
   state: () => ({

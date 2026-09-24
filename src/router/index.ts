@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import auctionRoutes from "../modules/auction/router";
+import { auctionRoutes } from "@/modules/auction";
 import authRoutes from "../modules/auth/router";
 import userRoutes from "../modules/user/router";
 import { useAuthStore } from "../modules/auth/stores/auth.store";

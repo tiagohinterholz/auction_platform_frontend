@@ -59,7 +59,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
-import type { CreateAuctionPayload } from '../types';
+import type { CreateAuctionPayload } from '@/modules/auction/domain';
 import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
 import AppFormField from '@/components/AppFormField.vue';

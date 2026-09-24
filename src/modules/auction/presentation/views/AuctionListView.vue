@@ -100,7 +100,7 @@ import { storeToRefs } from 'pinia';
 // Componentes
 import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
-import AuctionTimer from '@/modules/auction/components/AuctionTimer.vue';
+import AuctionTimer from '@/modules/auction/presentation/components/AuctionTimer.vue';
 
 const router = useRouter();
 const auctionStore = useAuctionStore();

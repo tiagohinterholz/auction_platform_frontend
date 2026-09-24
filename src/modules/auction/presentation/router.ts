@@ -4,7 +4,7 @@ const auctionRoutes: RouteRecordRaw[] = [
   {
     path: "/auctions",
     name: "AuctionList",
-    component: () => import("../views/AuctionListView.vue"),
+    component: () => import("./views/AuctionListView.vue"),
     meta: {
       title: "List of Auctions",
     },
@@ -12,7 +12,7 @@ const auctionRoutes: RouteRecordRaw[] = [
   {
     path: "/auctions/create",
     name: "CreateAuction",
-    component: () => import("../views/CreateAuctionView.vue"),
+    component: () => import("./views/CreateAuctionView.vue"),
     meta: {
       title: "Criar Novo Leilão",
       requiresAuth: true,
@@ -21,7 +21,7 @@ const auctionRoutes: RouteRecordRaw[] = [
   {
     path: "/auctions/:id",
     name: "AuctionDetail",
-    component: () => import("../views/AuctionDetailView.vue"),
+    component: () => import("./views/AuctionDetailView.vue"),
     props: true,
     meta: {
       title: "Auction Details",
@@ -30,7 +30,7 @@ const auctionRoutes: RouteRecordRaw[] = [
   {
     path: "/my-auctions",
     name: "MyAuctions",
-    component: () => import("../views/MyAuctionsView.vue"),
+    component: () => import("./views/MyAuctionsView.vue"),
     meta: {
       title: "My Auctions",
       requiresAuth: true,

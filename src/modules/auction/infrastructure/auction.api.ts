@@ -4,7 +4,7 @@ import type {
   CancelAuctionPayload,
   CreateAuctionPayload,
   ScheduleAuctionPayload,
-} from "../types";
+} from "@/modules/auction/domain";
 
 /**
  * Backend contract is snake_case, money fields are Decimal serialized as
