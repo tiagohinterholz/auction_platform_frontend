@@ -1,5 +1,5 @@
 import { api } from "@/api/http";
-import type { UpdateUserPayload, User } from "../types";
+import type { UpdateUserPayload, User } from "../domain";
 
 // Unlike auction/bidding, UserResponse's fields (id, name, email, role) have
 // no multi-word names, so there is nothing for snake_case vs camelCase to

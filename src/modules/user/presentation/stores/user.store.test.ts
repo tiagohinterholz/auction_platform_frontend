@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
-import { UserAPI } from "../api/user.api";
+import { UserAPI } from "../../infrastructure/user.api";
 import { useUserStore } from "./user.store";
 
-vi.mock("../api/user.api", () => ({
+vi.mock("@/modules/user/infrastructure/user.api", () => ({
   UserAPI: {
     getById: vi.fn(),
     update: vi.fn(),

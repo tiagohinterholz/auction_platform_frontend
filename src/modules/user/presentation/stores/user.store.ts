@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { UserAPI } from "../api/user.api";
-import type { UpdateUserPayload, User } from "../types";
+import { UserAPI } from "../../infrastructure/user.api";
+import type { UpdateUserPayload, User } from "../../domain/";
 
 export const useUserStore = defineStore("user", {
   state: () => ({

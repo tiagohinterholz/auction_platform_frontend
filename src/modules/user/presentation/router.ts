@@ -4,7 +4,7 @@ const userRoutes: RouteRecordRaw[] = [
   {
     path: "/profile",
     name: "UserProfile",
-    component: () => import("../views/UserProfileView.vue"),
+    component: () => import("./views/UserProfileView.vue"),
     meta: {
       title: "Meu Perfil",
       requiresAuth: true,
