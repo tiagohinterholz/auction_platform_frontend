@@ -3,7 +3,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
 import { storeToRefs } from 'pinia';
-import { AuctionStatus, type Auction } from '@/modules/auction/domain';
+import { canBeCancelled, canBeScheduled, type Auction } from '@/modules/auction/domain';
 import AppCard from '@/components/AppCard.vue';
 import AppButton from '@/components/AppButton.vue';
 import AppAlert from '@/components/AppAlert.vue';
@@ -116,13 +116,9 @@ onMounted(() => {
 
             <!-- Ações -->
             <div class="flex gap-2 flex-shrink-0">
-              <template v-if="auction.status === AuctionStatus.CREATED">
-                <AppButton variant="primary" @click="openScheduleModal(auction)">Agendar</AppButton>
-                <AppButton variant="secondary" @click="openCancelModal(auction)">Cancelar</AppButton>
-              </template>
-              <template v-else-if="auction.status === AuctionStatus.SCHEDULED">
-                <AppButton variant="secondary" @click="openCancelModal(auction)">Cancelar</AppButton>
-              </template>
+
+              <AppButton v-if="canBeScheduled(auction)" variant="primary" @click="openScheduleModal(auction)">Agendar</AppButton>
+              <AppButton v-if="canBeCancelled(auction)" variant="secondary" @click="openCancelModal(auction)">Cancelar</AppButton>
             </div>
           </AppCard>
         </div>

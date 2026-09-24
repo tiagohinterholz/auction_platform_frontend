@@ -25,7 +25,7 @@
             />
             <div
               class="absolute top-6 right-6 px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs shadow-2xl"
-              :class="currentAuction.status === AuctionStatus.ACTIVE ? 'bg-emerald-500 text-white' : 'bg-sky-500 text-white'"
+              :class="isAuctionActive(currentAuction) ? 'bg-emerald-500 text-white' : 'bg-sky-500 text-white'"
             >
               {{ currentAuction.status }}
             </div>
@@ -61,7 +61,7 @@
             <span class="text-slate-500 text-[10px] uppercase font-black">Lance Atual</span>
             <div class="flex items-baseline gap-2 mt-1">
               <span class="text-2xl font-bold text-sky-400 italic">R$</span>
-              <span class="text-6xl font-black transition-all">{{ currentHighestBid.toLocaleString('pt-BR') }}</span>
+              <span class="text-6xl font-black transition-all">{{ currentAuction.highestBid.toLocaleString('pt-BR') }}</span>
             </div>
             <span class="text-slate-500 text-sm italic">{{ biddingStore.bids.length }} lances registrados</span>
           </div>
@@ -74,19 +74,19 @@
               <input
                 type="number"
                 v-model.number="bidAmount"
-                :min="minNextBid"
+                :min="nextMinBid"
                 class="w-full bg-black/20 border border-white/10 rounded-2xl pl-14 pr-6 py-5 text-2xl font-black text-white focus:outline-none focus:border-sky-400 focus:bg-white/[0.05] transition-all"
                 required
               />
             </div>
             <p class="text-center text-slate-500 text-xs">
-              Mínimo sugerido: <span class="text-slate-300 font-bold">R$ {{ minNextBid.toLocaleString('pt-BR') }}</span>
+              Mínimo sugerido: <span class="text-slate-300 font-bold">R$ {{ nextMinBid.toLocaleString('pt-BR') }}</span>
             </p>
 
             <AppButton
               type="submit"
               class="w-full"
-              :disabled="!isAuctionActive || isBidSubmitting"
+              :disabled="!canPlaceBid(currentAuction, bidAmount) || isBidSubmitting"
             >
               <span v-if="isBidSubmitting">Enviando...</span>
               <span v-else>Dar Lance Agora</span>
@@ -137,14 +137,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
 import { useBiddingStore } from '@/modules/bidding';
 import { useAuthStore } from '@/modules/auth';
 import { useAuctionSocket } from '../composables/useAuctionSocket';
 import { storeToRefs } from 'pinia';
-import { AuctionStatus } from '@/modules/auction/domain';
+import { canPlaceBid, isAuctionActive, minNextBid } from '@/modules/auction/domain';
 import AuctionTimer from '@/modules/auction/presentation/components/AuctionTimer.vue';
 import AppCard from '@/components/AppCard.vue';
 import AppButton from '@/components/AppButton.vue';
@@ -163,35 +163,25 @@ const { connect, isConnected } = useAuctionSocket(auctionId);
 const bidAmount = ref(0);
 const isBidSubmitting = ref(false);
 const bidError = ref<string | null>(null);
-
+  
 const fetchData = async () => {
   await Promise.all([
     auctionStore.fetchAuctionById(auctionId),
     biddingStore.fetchBids(auctionId),
   ]);
-
+  
   if (currentAuction.value) {
-    bidAmount.value = minNextBid.value;
+    bidAmount.value = nextMinBid.value;
   }
 };
 
-const currentHighestBid = computed(() => {
-  if (!currentAuction.value) return 0;
-  return currentAuction.value.highestBid ?? currentAuction.value.startingPrice;
-});
-
-const minNextBid = computed(() => {
-  if (!currentAuction.value) return 0;
-  return currentHighestBid.value + currentAuction.value.minimumIncrement;
-});
-
-const isAuctionActive = computed(() => {
-  return currentAuction.value?.status === AuctionStatus.ACTIVE;
-});
-
-watch(currentHighestBid, (newVal) => {
-  if (bidAmount.value < newVal + (currentAuction.value?.minimumIncrement ?? 0)) {
-    bidAmount.value = newVal + (currentAuction.value?.minimumIncrement ?? 0);
+const nextMinBid = computed(() =>
+  currentAuction.value ? minNextBid(currentAuction.value) : 0
+);
+  
+watch(() => currentAuction.value?.highestBid, () => {
+  if (bidAmount.value < nextMinBid.value) {
+    bidAmount.value = nextMinBid.value;
   }
 });
 
@@ -219,6 +209,7 @@ function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 }
+
 
 onMounted(async () => {
   biddingStore.clearBids();
