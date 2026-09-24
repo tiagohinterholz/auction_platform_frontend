@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import { authApi } from "../api/auth.api";
-import type { LoginDto } from "../types/login.dto";
-import type { RegisterDto } from "../types/register.dto";
-import type { AuthResponseDto } from "../types/auth-response.dto";
+import { authApi } from "../../infrastructure/auth.api";
+import type { LoginDto } from "../../domain/login.dto";
+import type { RegisterDto } from "../../domain/register.dto";
+import type { AuthResponseDto } from "../../infrastructure/auth-response.dto";
 
 interface AuthState {
   accessToken: string | null;

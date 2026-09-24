@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { setActivePinia, createPinia } from "pinia";
-import { authApi } from "../api/auth.api";
+import { authApi } from "../../infrastructure/auth.api";
 import { useAuthStore } from "./auth.store";
 
-vi.mock("../api/auth.api", () => ({
+vi.mock("@/modules/auth/infrastructure/auth.api", () => ({
   authApi: {
     login: vi.fn(),
     register: vi.fn(),

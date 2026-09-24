@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
-import { useAuthStore } from "@/modules/auth/stores/auth.store";
+import { useAuthStore } from "@/modules/auth";
 import { useUserStore } from "../stores/user.store";
 import AppCard from "@/components/AppCard.vue";
 import AppFormField from "@/components/AppFormField.vue";

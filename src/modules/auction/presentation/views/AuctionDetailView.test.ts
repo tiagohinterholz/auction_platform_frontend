@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import { setActivePinia, createPinia } from "pinia";
 import { api } from "@/api/http";
-import { useAuthStore } from "@/modules/auth/stores/auth.store";
+import { useAuthStore } from "@/modules/auth";
 import AuctionDetailView from "./AuctionDetailView.vue";
 
 vi.mock("vue-router", () => ({

@@ -1,7 +1,7 @@
 import type { AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
 import router from "../router";
-import { useAuthStore } from "../modules/auth/stores/auth.store";
+import { useAuthStore } from "@/modules/auth";
 
 export const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,

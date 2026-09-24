@@ -2,11 +2,11 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth.store';
-import type { RegisterDto } from '../types/register.dto';
-import AppCard from '../../../components/AppCard.vue';
-import AppFormField from '../../../components/AppFormField.vue';
-import AppButton from '../../../components/AppButton.vue';
-import AppAlert from '../../../components/AppAlert.vue';
+import type { RegisterDto } from '../../domain/register.dto';
+import AppCard from '@/components/AppCard.vue';
+import AppFormField from '@/components/AppFormField.vue';
+import AppButton from '@/components/AppButton.vue';
+import AppAlert from '@/components/AppAlert.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();

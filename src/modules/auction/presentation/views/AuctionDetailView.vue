@@ -141,7 +141,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
 import { useBiddingStore } from '@/modules/bidding';
-import { useAuthStore } from '@/modules/auth/stores/auth.store';
+import { useAuthStore } from '@/modules/auth';
 import { useAuctionSocket } from '../composables/useAuctionSocket';
 import { storeToRefs } from 'pinia';
 import { AuctionStatus } from '@/modules/auction/domain';

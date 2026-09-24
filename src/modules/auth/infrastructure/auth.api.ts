@@ -1,10 +1,10 @@
-import { api } from "../../../api/http";
-import { LoginDto } from "../types/login.dto";
-import { RegisterDto } from "../types/register.dto";
+import { api } from "@/api/http";
+import { LoginDto } from "../domain/login.dto";
+import { RegisterDto } from "../domain/register.dto";
 import {
   AuthResponseDto,
   RefreshResponseDto,
-} from "../types/auth-response.dto";
+} from "./auth-response.dto";
 
 export const authApi = {
   login: async (payload: LoginDto): Promise<AuthResponseDto> => {

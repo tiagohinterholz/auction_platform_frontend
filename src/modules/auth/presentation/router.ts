@@ -4,7 +4,7 @@ const authRoutes: RouteRecordRaw[] = [
   {
     path: "/login",
     name: "Login",
-    component: () => import("../views/LoginView.vue"),
+    component: () => import("./views/LoginView.vue"),
     meta: {
       title: "Login",
     },
@@ -12,7 +12,7 @@ const authRoutes: RouteRecordRaw[] = [
   {
     path: "/register",
     name: "Register",
-    component: () => import("../views/RegisterView.vue"),
+    component: () => import("./views/RegisterView.vue"),
     meta: {
       title: "Register",
     },
