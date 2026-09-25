@@ -85,11 +85,7 @@ export const useAuctionStore = defineStore("auctions", {
       const result = await auctionGateway.cancelAuction(id, payload);
 
       if (result.ok) {
-        const canceled = result.value;
-        const indexPublic = this.auctions.findIndex(a => a.auctionId === id)
-        if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, canceled)
-        const indexMy = this.myAuctions.findIndex(a => a.auctionId === id)
-        if (indexMy !== -1) this.myAuctions.splice(indexMy, 1, canceled)
+        this.replaceAuction(result.value);
       } else {
         this.error = result.error.message;
       }
@@ -104,16 +100,19 @@ export const useAuctionStore = defineStore("auctions", {
       const result = await auctionGateway.scheduleAuction(id, payload);
 
       if (result.ok) {
-        const scheduled = result.value;
-        const indexPublic = this.auctions.findIndex(a => a.auctionId === id)
-        if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, scheduled)
-        const indexMy = this.myAuctions.findIndex(a => a.auctionId === id)
-        if (indexMy !== -1) this.myAuctions.splice(indexMy, 1, scheduled)
+        this.replaceAuction(result.value);
       } else {
         this.error = result.error.message;
       }
 
       this.isLoading = false;
     },
+
+    replaceAuction(updated: Auction) {
+      const indexPublic = this.auctions.findIndex(a => a.auctionId === updated.auctionId)
+      if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, updated)
+      const indexMy = this.myAuctions.findIndex(a => a.auctionId === updated.auctionId)
+      if (indexMy !== -1) this.myAuctions.splice(indexMy, 1, updated)
+    }
   },
 });
