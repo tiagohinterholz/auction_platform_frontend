@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { AuctionAPI } from "../../infrastructure/auction.api";
+import { HttpAuctionGateway } from "../../infrastructure/http-auction.gateway";
 import {
   AuctionStatus,
   type Auction,
@@ -7,6 +7,8 @@ import {
   type CreateAuctionPayload,
   type ScheduleAuctionPayload,
 } from "@/modules/auction/domain";
+
+const auctionGateway = new HttpAuctionGateway();
 
 export const useAuctionStore = defineStore("auctions", {
   state: () => ({
@@ -31,7 +33,7 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = true;
       this.error = null;
       try {
-        const data = await AuctionAPI.getAuctions();
+        const data = await auctionGateway.getAuctions();
         this.auctions = data;
       } catch (err: any) {
         this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao buscar leilões.';
@@ -44,7 +46,7 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = true;
       this.error = null;
       try {
-        const data = await AuctionAPI.getMyAuctions();
+        const data = await auctionGateway.getMyAuctions();
         this.myAuctions = data;
       } catch (err: any) {
         this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao buscar seus leilões.';
@@ -57,7 +59,7 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = true;
       this.error = null;
       try {
-        const newAuction = await AuctionAPI.create(payload);
+        const newAuction = await auctionGateway.createAuction(payload);
         return newAuction;
       } catch (err: any) {
         this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao criar leilão.';
@@ -71,7 +73,7 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = true;
       this.error = null;
       try {
-        const data = await AuctionAPI.getById(id);
+        const data = await auctionGateway.getAuctionById(id);
         this.currentAuction = data;
       } catch (err: any) {
         this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao buscar detalhes do leilão.';
@@ -84,7 +86,7 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = true;
       this.error = null;
       try {
-        const canceled = await AuctionAPI.cancel(id, payload)
+        const canceled = await auctionGateway.cancelAuction(id, payload)
         const indexPublic = this.auctions.findIndex(a => a.auctionId === id)
         if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, canceled)
         const indexMy = this.myAuctions.findIndex(a => a.auctionId === id)
@@ -102,7 +104,7 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = true;
       this.error = null;
       try {
-        const scheduled = await AuctionAPI.schedule(id, data);
+        const scheduled = await auctionGateway.scheduleAuction(id, data);
         const indexPublic = this.auctions.findIndex(a => a.auctionId === id)
         if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, scheduled)
         const indexMy = this.myAuctions.findIndex(a => a.auctionId === id)

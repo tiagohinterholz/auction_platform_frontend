@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { api } from "@/api/http";
-import { AuctionAPI, mapAuction } from "./auction.api";
+import { HttpAuctionGateway, mapAuction } from "./http-auction.gateway";
 
 vi.mock("@/api/http", () => ({
   api: {
@@ -60,10 +60,11 @@ describe("mapAuction", () => {
   });
 });
 
-describe("AuctionAPI", () => {
+describe("HttpAuctionGateway", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
+  const auctionGateway = new HttpAuctionGateway();
 
   it("create() sends snake_case field names, not the internal camelCase ones", async () => {
     vi.mocked(api.post).mockResolvedValue({
@@ -73,7 +74,7 @@ describe("AuctionAPI", () => {
       },
     });
 
-    await AuctionAPI.create({
+    await auctionGateway.createAuction({
       title: "t",
       description: "d",
       startingPrice: 10,
@@ -100,7 +101,7 @@ describe("AuctionAPI", () => {
 
     const startTime = "2026-06-01T10:00";
     const endTime = "2026-06-01T12:00";
-    await AuctionAPI.schedule("a1", { startTime, endTime });
+    await auctionGateway.scheduleAuction("a1", { startTime, endTime });
 
     expect(api.patch).toHaveBeenCalledWith("/auctions/a1/schedule", {
       start_date: new Date(startTime).toISOString(),

@@ -5,6 +5,7 @@ import type {
   CreateAuctionPayload,
   ScheduleAuctionPayload,
 } from "@/modules/auction/domain";
+import type { AuctionGateway } from '../application/ports/auction.gateway';
 
 /**
  * Backend contract is snake_case, money fields are Decimal serialized as
@@ -28,23 +29,23 @@ export function mapAuction(raw: any): Auction {
   };
 }
 
-export class AuctionAPI {
-  static async getAuctions(): Promise<Auction[]> {
+export class HttpAuctionGateway implements AuctionGateway {
+  async getAuctions(): Promise<Auction[]> {
     const response = await api.get<any[]>("/auctions");
     return response.data.map(mapAuction);
   }
 
-  static async getById(id: string): Promise<Auction> {
+  async getAuctionById(id: string): Promise<Auction> {
     const response = await api.get<any>(`/auctions/${id}`);
     return mapAuction(response.data);
   }
 
-  static async getMyAuctions(): Promise<Auction[]> {
+  async getMyAuctions(): Promise<Auction[]> {
     const response = await api.get<any[]>("/auctions/me");
     return response.data.map(mapAuction);
   }
 
-  static async create(payload: CreateAuctionPayload): Promise<Auction> {
+  async createAuction(payload: CreateAuctionPayload): Promise<Auction> {
     const response = await api.post<any>("/auctions", {
       title: payload.title,
       description: payload.description,
@@ -55,7 +56,7 @@ export class AuctionAPI {
     return mapAuction(response.data);
   }
 
-  static async schedule(
+  async scheduleAuction(
     id: string,
     payload: ScheduleAuctionPayload,
   ): Promise<Auction> {
@@ -66,7 +67,7 @@ export class AuctionAPI {
     return mapAuction(response.data);
   }
 
-  static async cancel(
+  async cancelAuction(
     id: string,
     payload: CancelAuctionPayload,
   ): Promise<Auction> {
