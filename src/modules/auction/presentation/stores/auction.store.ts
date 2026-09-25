@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { HttpAuctionGateway } from "../../infrastructure/http-auction.gateway";
 import {
   AuctionStatus,
   type Auction,
@@ -7,8 +6,7 @@ import {
   type CreateAuctionPayload,
   type ScheduleAuctionPayload,
 } from "@/modules/auction/domain";
-
-const auctionGateway = new HttpAuctionGateway();
+import { auctionGateway } from "@/container";
 
 export const useAuctionStore = defineStore("auctions", {
   state: () => ({
