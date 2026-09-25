@@ -6,6 +6,7 @@ import type {
   ScheduleAuctionPayload,
 } from "@/modules/auction/domain";
 import type { AuctionGateway } from '../application/ports/auction.gateway';
+import { type AppError, type Result, ok, fail } from '@/shared/lib/result';
 
 /**
  * Backend contract is snake_case, money fields are Decimal serialized as
@@ -29,51 +30,85 @@ export function mapAuction(raw: any): Auction {
   };
 }
 
+export function toAppError(error: any): AppError {
+  const status = error.response?.status;
+  const message = error.response?.data?.detail ?? error.response?.data?.message ?? "Erro inesperado";
+  if (status === 400 || status === 422) return { kind: "Validation", message };
+  if (status === 401) return { kind: "Unauthorized", message };
+  if (status === 403) return { kind: "Forbidden", message };
+  if (status === 404) return { kind: "NotFound", message };
+  return { kind: "Unexpected", message };
+}
+
 export class HttpAuctionGateway implements AuctionGateway {
-  async getAuctions(): Promise<Auction[]> {
-    const response = await api.get<any[]>("/auctions");
-    return response.data.map(mapAuction);
+  async getAuctions(): Promise<Result<Auction[]>> {
+    try {
+      const response = await api.get<any[]>("/auctions");
+      return ok(response.data.map(mapAuction));
+    } catch (error) {
+      return fail(toAppError(error));
+    }
   }
 
-  async getAuctionById(id: string): Promise<Auction> {
-    const response = await api.get<any>(`/auctions/${id}`);
-    return mapAuction(response.data);
+  async getAuctionById(id: string): Promise<Result<Auction>> {
+    try {
+      const response = await api.get<any>(`/auctions/${id}`);
+      return ok(mapAuction(response.data));
+    } catch (error) {
+      return fail(toAppError(error));
+    }
   }
 
-  async getMyAuctions(): Promise<Auction[]> {
-    const response = await api.get<any[]>("/auctions/me");
-    return response.data.map(mapAuction);
+  async getMyAuctions(): Promise<Result<Auction[]>> {
+    try {
+      const response = await api.get<any[]>("/auctions/me");
+      return ok(response.data.map(mapAuction));
+    } catch (error) {
+      return fail(toAppError(error));
+    }
   }
 
-  async createAuction(payload: CreateAuctionPayload): Promise<Auction> {
-    const response = await api.post<any>("/auctions", {
-      title: payload.title,
-      description: payload.description,
-      start_price: payload.startingPrice,
-      minimum_increment: payload.minimumIncrement,
-      images: payload.images,
-    });
-    return mapAuction(response.data);
+  async createAuction(payload: CreateAuctionPayload): Promise<Result<Auction>> {
+    try {
+      const response = await api.post<any>("/auctions", {
+        title: payload.title,
+        description: payload.description,
+        start_price: payload.startingPrice,
+        minimum_increment: payload.minimumIncrement,
+        images: payload.images,
+      });
+      return ok(mapAuction(response.data));
+    } catch (error) {
+      return fail(toAppError(error));
+    }
   }
 
   async scheduleAuction(
     id: string,
     payload: ScheduleAuctionPayload,
-  ): Promise<Auction> {
-    const response = await api.patch<any>(`/auctions/${id}/schedule`, {
-      start_date: new Date(payload.startTime).toISOString(),
-      end_date: new Date(payload.endTime).toISOString(),
-    });
-    return mapAuction(response.data);
+  ): Promise<Result<Auction>> {
+    try {
+      const response = await api.patch<any>(`/auctions/${id}/schedule`, {
+        start_date: new Date(payload.startTime).toISOString(),
+        end_date: new Date(payload.endTime).toISOString(),
+      });
+      return ok(mapAuction(response.data));
+    } catch (error) {
+      return fail(toAppError(error));
+    }
   }
 
   async cancelAuction(
     id: string,
     payload: CancelAuctionPayload,
-  ): Promise<Auction> {
-    const response = await api.patch<any>(`/auctions/${id}/cancel`, {
-      reason: payload.reason,
-    });
-    return mapAuction(response.data);
+  ): Promise<Result<Auction>> {
+    try {
+      const response = await api.patch<any>(`/auctions/${id}/cancel`, {
+        reason: payload.reason,
+      });
+      return ok(mapAuction(response.data));
+    } catch (error) {
+      return fail(toAppError(error));
+    }
   }
 }

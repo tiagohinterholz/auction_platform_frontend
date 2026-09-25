@@ -32,89 +32,90 @@ export const useAuctionStore = defineStore("auctions", {
     async fetchAuctions() {
       this.isLoading = true;
       this.error = null;
-      try {
-        const data = await auctionGateway.getAuctions();
-        this.auctions = data;
-      } catch (err: any) {
-        this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao buscar leilões.';
-      } finally {
-        this.isLoading = false;
-      }
+      
+      const result = await auctionGateway.getAuctions();
+
+      if (result.ok) this.auctions = result.value;
+      else this.error = result.error.message;
+
+      this.isLoading = false;
     },
 
     async fetchMyAuctions() {
       this.isLoading = true;
       this.error = null;
-      try {
-        const data = await auctionGateway.getMyAuctions();
-        this.myAuctions = data;
-      } catch (err: any) {
-        this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao buscar seus leilões.';
-      } finally {
-        this.isLoading = false;
-      }
+
+      const result = await auctionGateway.getMyAuctions();
+
+      if (result.ok) this.myAuctions = result.value;
+      else this.error = result.error.message;
+      this.isLoading = false;
     },
 
     async createAuction(payload: CreateAuctionPayload): Promise<Auction | null> {
       this.isLoading = true;
       this.error = null;
-      try {
-        const newAuction = await auctionGateway.createAuction(payload);
-        return newAuction;
-      } catch (err: any) {
-        this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao criar leilão.';
-        return null;
-      } finally {
-        this.isLoading = false;
-      }
+
+      const result = await auctionGateway.createAuction(payload);
+      
+      this.isLoading = false;
+      
+      if (result.ok) return result.value;
+      this.error = result.error.message;
+
+      return null;
     },
 
     async fetchAuctionById(id: string) {
       this.isLoading = true;
       this.error = null;
-      try {
-        const data = await auctionGateway.getAuctionById(id);
-        this.currentAuction = data;
-      } catch (err: any) {
-        this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao buscar detalhes do leilão.';
-      } finally {
-        this.isLoading = false;
+      const result = await auctionGateway.getAuctionById(id);
+      
+      if (result.ok) {
+        this.currentAuction = result.value;
+      } else {
+        this.error = result.error.message;
       }
+
+      this.isLoading = false;
     },
     
     async cancelAuction(id: string, payload: CancelAuctionPayload) {
       this.isLoading = true;
       this.error = null;
-      try {
-        const canceled = await auctionGateway.cancelAuction(id, payload)
+
+      const result = await auctionGateway.cancelAuction(id, payload);
+
+      if (result.ok) {
+        const canceled = result.value;
         const indexPublic = this.auctions.findIndex(a => a.auctionId === id)
         if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, canceled)
         const indexMy = this.myAuctions.findIndex(a => a.auctionId === id)
         if (indexMy !== -1) this.myAuctions.splice(indexMy, 1, canceled)
-
-
-      } catch (err: any) {
-        this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao cancelar leilão.';
-      } finally {
-        this.isLoading = false;
+      } else {
+        this.error = result.error.message;
       }
+
+      this.isLoading = false;
     },
 
-    async scheduleAuction(id: string, data: ScheduleAuctionPayload) {
+    async scheduleAuction(id: string, payload: ScheduleAuctionPayload) {
       this.isLoading = true;
       this.error = null;
-      try {
-        const scheduled = await auctionGateway.scheduleAuction(id, data);
+
+      const result = await auctionGateway.scheduleAuction(id, payload);
+
+      if (result.ok) {
+        const scheduled = result.value;
         const indexPublic = this.auctions.findIndex(a => a.auctionId === id)
         if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, scheduled)
         const indexMy = this.myAuctions.findIndex(a => a.auctionId === id)
         if (indexMy !== -1) this.myAuctions.splice(indexMy, 1, scheduled)
-
-      } catch (err: any) {
-        this.error = err.response?.data?.detail || err.response?.data?.message || 'Falha ao agendar leilão.';
-      } finally {
-        this.isLoading = false;
+      } else {
+        this.error = result.error.message;
       }
+
+      this.isLoading = false;
     },
   },
 });
