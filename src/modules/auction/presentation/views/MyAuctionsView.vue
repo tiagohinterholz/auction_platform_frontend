@@ -7,10 +7,15 @@ import { canBeCancelled, canBeScheduled, type Auction } from '@/modules/auction/
 import AppCard from '@/components/AppCard.vue';
 import AppButton from '@/components/AppButton.vue';
 import AppAlert from '@/components/AppAlert.vue';
+import { useCancelAuction } from '../composables/useCancelAuction';
+import { useScheduleAuction } from '../composables/useScheduleAuction';
 
 const router = useRouter();
 const auctionStore = useAuctionStore();
 const { myAuctions, isLoading, error } = storeToRefs(auctionStore);
+const { execute: cancel, isLoading: isCancelling, error: cancelError } = useCancelAuction();
+const { execute: schedule, isLoading: isScheduling, error: scheduleError } = useScheduleAuction();
+
 
 // --- Modal de agendamento ---
 const showScheduleModal = ref(false);
@@ -22,17 +27,17 @@ function openScheduleModal(auction: Auction) {
   scheduleForm.startTime = '';
   scheduleForm.endTime = '';
   showScheduleModal.value = true;
+  scheduleError.value = null;
 }
 
 async function confirmSchedule() {
   if (!selectedAuction.value) return;
-  await auctionStore.scheduleAuction(selectedAuction.value.auctionId, {
+  const ok = await schedule(selectedAuction.value, {
     startTime: scheduleForm.startTime,
     endTime: scheduleForm.endTime,
   });
-  showScheduleModal.value = false;
+  if (ok) showScheduleModal.value = false;
 }
-
 
 const showCancelModal = ref(false);
 const cancelReason = ref('');
@@ -41,14 +46,13 @@ function openCancelModal(auction: Auction) {
   selectedAuction.value = auction;
   cancelReason.value = '';
   showCancelModal.value = true;
+  cancelError.value = null
 }
 
 async function confirmCancel() {
-  if (!selectedAuction.value || !cancelReason.value.trim()) return;
-  await auctionStore.cancelAuction(selectedAuction.value.auctionId, {
-    reason: cancelReason.value,
-  });
-  showCancelModal.value = false;
+  if (!selectedAuction.value) return;
+  const ok = await cancel(selectedAuction.value, cancelReason.value); 
+  if (ok) showCancelModal.value = false;
 }
 
 // --- Navegação ---
@@ -154,9 +158,10 @@ onMounted(() => {
             />
           </div>
         </div>
+        <AppAlert v-if="scheduleError" type="error" :message="scheduleError" class="mt-4" />
         <div class="flex gap-3 mt-6 justify-end">
           <AppButton variant="secondary" @click="showScheduleModal = false">Cancelar</AppButton>
-          <AppButton variant="primary" :loading="isLoading" @click="confirmSchedule">Confirmar</AppButton>
+          <AppButton variant="primary" :loading="isScheduling" @click="confirmSchedule">Confirmar</AppButton>
         </div>
       </AppCard>
     </div>
@@ -175,12 +180,13 @@ onMounted(() => {
           placeholder="Motivo do cancelamento..."
           class="w-full bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all resize-none"
         />
+        <AppAlert v-if="cancelError" type="error" :message="cancelError" class="mt-4" />
         <div class="flex gap-3 mt-6 justify-end">
           <AppButton variant="secondary" @click="showCancelModal = false">Voltar</AppButton>
           <AppButton
             class="!border-red-500/30 !text-red-400 hover:!bg-red-500/10"
             variant="secondary"
-            :loading="isLoading"
+            :loading="isCancelling"
             :disabled="!cancelReason.trim()"
             @click="confirmCancel"
           >

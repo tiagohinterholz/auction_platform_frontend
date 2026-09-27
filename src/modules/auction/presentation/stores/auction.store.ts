@@ -78,36 +78,6 @@ export const useAuctionStore = defineStore("auctions", {
       this.isLoading = false;
     },
     
-    async cancelAuction(id: string, payload: CancelAuctionPayload) {
-      this.isLoading = true;
-      this.error = null;
-
-      const result = await auctionGateway.cancelAuction(id, payload);
-
-      if (result.ok) {
-        this.replaceAuction(result.value);
-      } else {
-        this.error = result.error.message;
-      }
-
-      this.isLoading = false;
-    },
-
-    async scheduleAuction(id: string, payload: ScheduleAuctionPayload) {
-      this.isLoading = true;
-      this.error = null;
-
-      const result = await auctionGateway.scheduleAuction(id, payload);
-
-      if (result.ok) {
-        this.replaceAuction(result.value);
-      } else {
-        this.error = result.error.message;
-      }
-
-      this.isLoading = false;
-    },
-
     replaceAuction(updated: Auction) {
       const indexPublic = this.auctions.findIndex(a => a.auctionId === updated.auctionId)
       if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, updated)

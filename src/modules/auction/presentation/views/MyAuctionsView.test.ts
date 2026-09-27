@@ -94,4 +94,45 @@ describe("MyAuctionsView", () => {
       reason: "Não vendo mais o item.",
     });
   });
+
+  it("keeps the auction list visible while a cancellation is in flight", async () => {
+    let resolvePatch!: (value: unknown) => void;
+    vi.mocked(api.patch).mockReturnValue(
+      new Promise((resolve) => { resolvePatch = resolve; }) as never,
+    );
+    const wrapper = mountView();
+    await flushPromises();
+
+    await wrapper.findAll("button").find((b) => b.text() === "Cancelar")!.trigger("click");
+    await wrapper.find("textarea").setValue("Não vendo mais o item.");
+    await wrapper
+      .findAll("button")
+      .find((b) => b.text().includes("Confirmar Cancelamento"))!
+      .trigger("click");
+
+    expect(wrapper.text()).toContain("iPhone 15");
+    expect(wrapper.text()).not.toContain("Carregando seus leilões");
+
+    resolvePatch({ data: { ...createdAuction, status: "cancelled" } });
+    await flushPromises();
+  });
+
+  it("shows the backend error inside the cancel modal and keeps it open", async () => {
+    vi.mocked(api.patch).mockRejectedValue({
+      response: { status: 422, data: { detail: "Leilão já iniciado" } },
+    });
+    const wrapper = mountView();
+    await flushPromises();
+
+    await wrapper.findAll("button").find((b) => b.text() === "Cancelar")!.trigger("click");
+    await wrapper.find("textarea").setValue("Não vendo mais o item.");
+    await wrapper
+      .findAll("button")
+      .find((b) => b.text().includes("Confirmar Cancelamento"))!
+      .trigger("click");
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("Leilão já iniciado");
+    expect(wrapper.find("textarea").exists()).toBe(true);
+  });
 });
