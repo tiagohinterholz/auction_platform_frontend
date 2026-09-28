@@ -137,10 +137,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from 'vue';
+import { onMounted, watch, computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuctionStore } from '../stores/auction.store';
-import { useBiddingStore } from '@/modules/bidding';
+import { useBiddingStore, usePlaceBid } from '@/modules/bidding';
 import { useAuthStore } from '@/modules/auth';
 import { useAuctionSocket } from '../composables/useAuctionSocket';
 import { storeToRefs } from 'pinia';
@@ -161,8 +161,7 @@ const auctionId = route.params.id as string;
 const { connect, isConnected } = useAuctionSocket(auctionId);
 
 const bidAmount = ref(0);
-const isBidSubmitting = ref(false);
-const bidError = ref<string | null>(null);
+const { execute: placeBid, isLoading: isBidSubmitting, error: bidError } = usePlaceBid();
   
 const fetchData = async () => {
   await Promise.all([
@@ -191,18 +190,7 @@ function handleTimerEnd() {
 
 async function handlePlaceBid() {
   if (!isAuthenticated.value) return;
-  bidError.value = null;
-  isBidSubmitting.value = true;
-
-  const success = await biddingStore.placeBid(auctionId, bidAmount.value);
-
-  if (!success) {
-    bidError.value = biddingStore.error;
-  } else {
-    await biddingStore.fetchBids(auctionId);
-  }
-
-  isBidSubmitting.value = false;
+  await placeBid(auctionId, bidAmount.value);
 }
 
 function formatDate(dateStr: string): string {

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { BiddingAPI } from "../../infrastructure/bidding.api";
+import { biddingGateway } from "@/container";
 import type { Bid } from "../../domain";
 
 export const useBiddingStore = defineStore("bidding", {
@@ -20,26 +20,12 @@ export const useBiddingStore = defineStore("bidding", {
     async fetchBids(auctionId: string) {
       this.isLoading = true;
       this.error = null;
-      try {
-        this.bids = await BiddingAPI.getBidsByAuction(auctionId);
-      } catch (err: any) {
-        this.error =
-          err.response?.data?.message || "Falha ao buscar lances.";
-      } finally {
-        this.isLoading = false;
-      }
-    },
+      const result = await biddingGateway.getBidsByAuction(auctionId);
 
-    async placeBid(auctionId: string, amount: number): Promise<boolean> {
-      this.error = null;
-      try {
-        await BiddingAPI.placeBid(auctionId, { amount });
-        return true;
-      } catch (err: any) {
-        this.error =
-          err.response?.data?.message || "Falha ao registrar lance.";
-        return false;
-      }
+      if (result.ok) this.bids = result.value;
+      else this.error = result.error.message;
+      
+      this.isLoading = false;
     },
 
     clearBids() {
