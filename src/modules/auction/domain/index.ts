@@ -4,3 +4,4 @@ export * from './cancel-auction.payload';
 export * from './create-auction.payload';
 export * from './schedule-auction.payload';
 export * from './auction.rules';
+export * from './auction-events';

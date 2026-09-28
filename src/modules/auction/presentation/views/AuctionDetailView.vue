@@ -158,7 +158,7 @@ const { currentAuction, isLoading, error } = storeToRefs(auctionStore);
 const { isAuthenticated } = storeToRefs(authStore);
 
 const auctionId = route.params.id as string;
-const { connect, isConnected } = useAuctionSocket(auctionId);
+const { connect, isConnected } = useAuctionSocket(auctionId, () => biddingStore.fetchBids(auctionId));
 
 const bidAmount = ref(0);
 const { execute: placeBid, isLoading: isBidSubmitting, error: bidError } = usePlaceBid();

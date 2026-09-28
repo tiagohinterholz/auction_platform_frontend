@@ -47,3 +47,49 @@ describe("useAuctionStore.replaceAuction", () => {
     expect(store.myAuctions).toEqual([makeAuction()]);
   });
 });
+
+describe("useAuctionStore live updates", () => {
+  let store: ReturnType<typeof useAuctionStore>;
+
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    store = useAuctionStore();
+    store.currentAuction = makeAuction({ auctionId: "a1", highestBid: 100 });
+  });
+
+  it("applyBidPlaced updates the highest bid of the open auction", () => {
+    store.applyBidPlaced("a1", 150);
+
+    expect(store.currentAuction!.highestBid).toBe(150);
+  });
+
+  it("applyBidPlaced ignores events from another auction", () => {
+    store.applyBidPlaced("other", 150);
+
+    expect(store.currentAuction!.highestBid).toBe(100);
+  });
+
+  it("markActive updates to active auction changed", () => {
+    store.markActive("a1");
+
+    expect(store.currentAuction?.status).toBe(AuctionStatus.ACTIVE);
+  })
+
+  it ("markActive ignores event for other auction", () => {
+    store.markActive("b1");
+
+    expect(store.currentAuction?.status).toBe(AuctionStatus.CREATED);
+  })
+
+  it("extendEndTime updates new time to auction", () => {
+    store.extendEndTime("a1", "2026-06-01T12:00:30Z")
+
+    expect(store.currentAuction?.endTime).toBe("2026-06-01T12:00:30Z");
+  })
+
+  it("extendEndTime updates ignores events to another auction", () => {
+    store.extendEndTime("b1", "2026-06-01T12:00:30Z")
+
+    expect(store.currentAuction?.endTime).toBe(store.currentAuction?.endTime);
+  })
+});

@@ -83,6 +83,21 @@ export const useAuctionStore = defineStore("auctions", {
       if (indexPublic !== -1) this.auctions.splice(indexPublic, 1, updated)
       const indexMy = this.myAuctions.findIndex(a => a.auctionId === updated.auctionId)
       if (indexMy !== -1) this.myAuctions.splice(indexMy, 1, updated)
-    }
+    },
+
+    applyBidPlaced(auctionId: string, amount: number) {
+      if (this.currentAuction?.auctionId !== auctionId) return;
+      this.currentAuction.highestBid = amount;
+    },
+      
+    markActive(auctionId: string) {
+      if (this.currentAuction?.auctionId !== auctionId) return;
+      this.currentAuction.status = AuctionStatus.ACTIVE;
+    },
+
+    extendEndTime(auctionId: string, endTime: string) {
+      if (this.currentAuction?.auctionId !== auctionId) return;
+      this.currentAuction.endTime = endTime;
+    }, 
   },
 });
