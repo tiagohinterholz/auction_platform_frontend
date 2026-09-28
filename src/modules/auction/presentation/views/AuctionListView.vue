@@ -36,22 +36,13 @@
           class="!p-0 group cursor-pointer hover:border-sky-400/50 transition-all duration-500 overflow-hidden"
           @click="goToDetails(auction.auctionId)"
         >
-          <!-- Imagem com Overlay de Status -->
+          <!-- Imagem -->
           <div class="relative aspect-video overflow-hidden">
-            <img 
-              :src="auction.images?.[0] || 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800'" 
+            <img
+              :src="auction.images?.[0] || 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800'"
               :alt="auction.title"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
-            <div class="absolute top-4 left-4">
-              <span class="px-3 py-1 bg-sky-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-xl">
-                {{ auction.status }}
-              </span>
-            </div>
-            <!-- Timer Pequeno sobre a imagem -->
-            <div class="absolute bottom-4 right-4">
-              <AuctionTimer v-if="auction.endTime" :endTime="auction.endTime" size="sm" />
-            </div>
           </div>
 
           <!-- Conteúdo do Card -->
@@ -74,6 +65,11 @@
                 <span class="text-[10px] text-slate-600 font-bold block">#{{ auction.auctionId.slice(0,6) }}</span>
                 <span class="text-sky-400 text-xs font-bold underline">Ver Lote</span>
               </div>
+            </div>
+
+            <!-- Status (ou contagem regressiva, se ativo) -->
+            <div class="flex justify-center pt-4 border-t border-white/5">
+              <AuctionStatusPill :auction="auction" />
             </div>
           </div>
         </AppCard>
@@ -100,7 +96,7 @@ import { storeToRefs } from 'pinia';
 // Componentes
 import AppButton from '@/components/AppButton.vue';
 import AppCard from '@/components/AppCard.vue';
-import AuctionTimer from '@/modules/auction/presentation/components/AuctionTimer.vue';
+import AuctionStatusPill from '@/modules/auction/presentation/components/AuctionStatusPill.vue';
 
 const router = useRouter();
 const auctionStore = useAuctionStore();

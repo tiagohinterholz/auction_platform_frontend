@@ -24,6 +24,12 @@ describe('Auction Rules', () => {
     expect(minNextBid(auction)).toBe(110);
   });
 
+  it('minNextBid rounds to cents instead of leaking float noise', () => {
+    const auction = makeAuction({ highestBid: 470.51, minimumIncrement: 23.53 });
+
+    expect(minNextBid(auction)).toBe(494.04);
+  });
+
   it('isAuctionActive returns true for active auctions', () => {
     const auction = makeAuction({ status: AuctionStatus.ACTIVE });
     

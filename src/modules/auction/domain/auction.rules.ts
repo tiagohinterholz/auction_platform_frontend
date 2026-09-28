@@ -2,7 +2,8 @@ import { AuctionStatus } from "./auction-status.enum";
 import type { Auction } from "./auction";
 
 export function minNextBid(auction: Auction): number {
-  return auction.highestBid + auction.minimumIncrement;
+  // Money is rounded to cents: plain float addition gives 494.03999999999996.
+  return Math.round((auction.highestBid + auction.minimumIncrement) * 100) / 100;
 };
 
 export function isAuctionActive(auction: Auction): boolean {
