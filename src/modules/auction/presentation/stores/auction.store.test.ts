@@ -87,9 +87,11 @@ describe("useAuctionStore live updates", () => {
     expect(store.currentAuction?.endTime).toBe("2026-06-01T12:00:30Z");
   })
 
-  it("extendEndTime updates ignores events to another auction", () => {
-    store.extendEndTime("b1", "2026-06-01T12:00:30Z")
+  it("extendEndTime ignores events from another auction", () => {
+    const before = store.currentAuction?.endTime;
 
-    expect(store.currentAuction?.endTime).toBe(store.currentAuction?.endTime);
-  })
+    store.extendEndTime("b1", "2026-06-01T12:00:30Z");
+
+    expect(store.currentAuction?.endTime).toBe(before);
+  });
 });
